@@ -42,5 +42,17 @@ namespace SpaceExplorer
 
         /// <summary>New best score reached on the End Game screen.</summary>
         NewRecord,
+
+        /// <summary>Pointer or keyboard selection moved onto another menu button.</summary>
+        UiHover,
+
+        /// <summary>An energy round burst against the ship's shield.</summary>
+        ShieldImpact,
+
+        /// <summary>Rock or hull slammed into the ship.</summary>
+        HullImpact,
+
+        /// <summary>Jingle for a run that ended without beating the best score.</summary>
+        GameOver,
     }
 }

@@ -15,6 +15,9 @@ namespace SpaceExplorer
 
         void Awake()
         {
+            // Moving between buttons ticks; pressing one answers with the click.
+            UiSound.Attach(playButton, instructionsButton, closeInstructionsButton, quitButton);
+
             playButton.onClick.AddListener(() => Click(() => SceneLoader.Load(SceneNames.Gameplay)));
             instructionsButton.onClick.AddListener(() => Click(() => instructionsPanel.SetActive(true)));
             closeInstructionsButton.onClick.AddListener(() => Click(() => instructionsPanel.SetActive(false)));

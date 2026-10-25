@@ -36,8 +36,11 @@ namespace SpaceExplorer
 
         /// <summary>Normalised remaining health (1 = full).</summary>
         public event Action<float> HealthChanged;
+
+        /// <summary>Raised once, after the death explosions have finished.</summary>
         public event Action Defeated;
 
+        /// <summary>The boss fights for the enemy side.</summary>
         public Faction Faction => Faction.Enemy;
 
         Rigidbody2D body;
@@ -96,9 +99,11 @@ namespace SpaceExplorer
             }
         }
 
-        public void TakeDamage(int amount)
+        /// <summary>Applies damage unless the boss is already dead or still flying in, and returns
+        /// whether the hit landed. See <see cref="IDamageable"/>.</summary>
+        public bool TakeDamage(int amount)
         {
-            if (isDead || !hasArrived) return; // invulnerable while flying in
+            if (isDead || !hasArrived) return false; // invulnerable while flying in
 
             health = Mathf.Max(0, health - amount);
             HealthChanged?.Invoke((float)health / maxHealth);
@@ -109,11 +114,17 @@ namespace SpaceExplorer
                 AudioDirector.Play(SoundEffect.BossHit);
                 StartCoroutine(HitFlashRoutine());
             }
+            return true;
         }
 
         void OnTriggerStay2D(Collider2D other)
         {
-            if (!isDead && other.TryGetComponent(out PlayerHealth player)) player.TakeDamage(1);
+            if (isDead || !other.TryGetComponent(out PlayerHealth player)) return;
+
+            // Contact repeats every physics step; the audio director rate-limits the grind to one
+            // hit at a time. The damage is refused while the ship is invulnerable, the sound is not.
+            AudioDirector.Play(SoundEffect.HullImpact);
+            player.TakeDamage(1);
         }
 
         IEnumerator HitFlashRoutine()

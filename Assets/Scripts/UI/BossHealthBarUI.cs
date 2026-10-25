@@ -11,6 +11,7 @@ namespace SpaceExplorer
 
         Boss boss;
 
+        /// <summary>Binds the bar to <paramref name="boss"/> and makes it visible.</summary>
         public void Show(Boss target)
         {
             Unbind();
@@ -20,6 +21,7 @@ namespace SpaceExplorer
             gameObject.SetActive(true);
         }
 
+        /// <summary>Unbinds from the boss and hides the bar.</summary>
         public void Hide()
         {
             Unbind();

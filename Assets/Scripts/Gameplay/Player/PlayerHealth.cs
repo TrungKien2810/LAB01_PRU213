@@ -15,11 +15,19 @@ namespace SpaceExplorer
         [SerializeField] SpriteRenderer[] blinkRenderers;
         [SerializeField] GameObject explosionPrefab;
 
+        /// <summary>Raised with the number of lives left every time it changes.</summary>
         public event Action<int> LivesChanged;
+
+        /// <summary>Raised once, when the last life is lost.</summary>
         public event Action Died;
 
+        /// <summary>The ship fights for the player side.</summary>
         public Faction Faction => Faction.Player;
+
+        /// <summary>Lives left in the current run.</summary>
         public int Lives { get; private set; }
+
+        /// <summary>Lives the ship starts a run with.</summary>
         public int MaxLives => maxLives;
 
         bool isInvulnerable;
@@ -28,9 +36,11 @@ namespace SpaceExplorer
 
         void Start() => LivesChanged?.Invoke(Lives);
 
-        public void TakeDamage(int amount)
+        /// <summary>Costs one life unless the ship is invulnerable or already destroyed, and
+        /// returns whether the hit landed. See <see cref="IDamageable"/>.</summary>
+        public bool TakeDamage(int amount)
         {
-            if (isInvulnerable || Lives <= 0) return;
+            if (isInvulnerable || Lives <= 0) return false; // the shields soak it; nothing to report
 
             Lives = Mathf.Max(0, Lives - amount);
             LivesChanged?.Invoke(Lives);
@@ -41,6 +51,7 @@ namespace SpaceExplorer
                 AudioDirector.Play(SoundEffect.PlayerHit);
                 StartCoroutine(InvulnerabilityRoutine());
             }
+            return true;
         }
 
         void Die()

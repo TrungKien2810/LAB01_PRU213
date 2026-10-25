@@ -13,6 +13,7 @@ namespace SpaceExplorer
         [SerializeField, Min(0f)] float horizontalPadding = 0.8f;
         [SerializeField, Min(0f)] float spawnHeightAboveScreen = 1f;
 
+        /// <summary>Stops spawning while true — used while a boss fight is running.</summary>
         public bool IsPaused { get; set; }
 
         float timer;

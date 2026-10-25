@@ -20,7 +20,10 @@ namespace SpaceExplorer
 
         /// <summary>Raised when the warning starts (true) and ends (false).</summary>
         public event Action<bool> WarningToggled;
+        /// <summary>Raised with the new boss so the HUD can bind to its health.</summary>
         public event Action<Boss> BossSpawned;
+
+        /// <summary>Raised when the fight is over and the asteroid stream resumes.</summary>
         public event Action BossDefeated;
 
         int nextBossScore;

@@ -12,6 +12,7 @@ namespace SpaceExplorer
         /// <summary>Raised with a positive (reward) or negative (penalty) amount of points.</summary>
         public static event Action<int> PointsAwarded;
 
+        /// <summary>Raises <see cref="PointsAwarded"/>: a positive amount rewards, a negative one penalises.</summary>
         public static void AwardPoints(int amount) => PointsAwarded?.Invoke(amount);
     }
 }

@@ -25,6 +25,10 @@ namespace SpaceExplorer
         {
             if (!other.TryGetComponent(out IDamageable target) || target.Faction == faction) return;
 
+            // An energy round bursting on the ship's shield is the loudest part of being shot, so
+            // it plays even while the ship is invulnerable and the hit itself is refused.
+            if (other.TryGetComponent(out PlayerHealth _)) AudioDirector.Play(SoundEffect.ShieldImpact);
+
             target.TakeDamage(damage);
             Destroy(gameObject);
         }

@@ -20,6 +20,7 @@ namespace SpaceExplorer
         [SerializeField] Vector2 scaleRange = new(0.7f, 1.2f);
         [SerializeField] GameObject explosionPrefab;
 
+        /// <summary>A rock is a hazard, so it fights for the enemy side.</summary>
         public Faction Faction => Faction.Enemy;
 
         void Start()
@@ -33,25 +34,30 @@ namespace SpaceExplorer
             body.angularVelocity = Random.Range(spinRange.x, spinRange.y);
         }
 
-        public void TakeDamage(int amount)
+        /// <summary>Chips a hit point off the rock; the last one destroys it and awards
+        /// <see cref="destroyPoints"/>. Always reports the hit as landed.</summary>
+        public bool TakeDamage(int amount)
         {
             hitPoints -= amount;
             if (hitPoints > 0)
             {
                 AudioDirector.Play(SoundEffect.AsteroidCrack);
-                return;
+                return true;
             }
 
             GameEvents.AwardPoints(destroyPoints);
             Explode();
+            return true;
         }
 
         void OnTriggerEnter2D(Collider2D other)
         {
             if (!other.TryGetComponent(out PlayerHealth player)) return;
 
-            player.TakeDamage(1);
-            GameEvents.AwardPoints(-collisionPenalty);
+            // Rock on hull is felt as weight; the blast that follows belongs to the rock itself.
+            AudioDirector.Play(SoundEffect.HullImpact);
+            // The penalty follows the damage: a hit the shields absorbed costs no points.
+            if (player.TakeDamage(1)) GameEvents.AwardPoints(-collisionPenalty);
             Explode();
         }
 

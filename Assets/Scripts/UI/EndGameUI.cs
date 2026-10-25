@@ -6,7 +6,9 @@ namespace SpaceExplorer
 {
     /// <summary>
     /// End Game screen: shows the final and best score, a medal for the score reached,
-    /// a "New Record" badge when the best score was beaten, and Home / Quit buttons.
+    /// a "New Record" badge when the best score was beaten, and Replay / Home / Quit buttons.
+    /// It also plays the run's verdict — the falling game-over jingle, or the fanfare when the
+    /// best score was beaten.
     /// </summary>
     public class EndGameUI : MonoBehaviour
     {
@@ -22,13 +24,19 @@ namespace SpaceExplorer
         [SerializeField] int[] medalThresholds = { 200, 600, 1200 };
 
         [Header("Buttons")]
+        [SerializeField] Button replayButton;
         [SerializeField] Button homeButton;
         [SerializeField] Button quitButton;
 
         void Awake()
         {
+            // A scene generated before the Replay button existed simply leaves the field empty.
+            if (replayButton) replayButton.onClick.AddListener(() => Click(() => SceneLoader.Load(SceneNames.Gameplay)));
             homeButton.onClick.AddListener(() => Click(() => SceneLoader.Load(SceneNames.MainMenu)));
             quitButton.onClick.AddListener(() => Click(AppQuit.Quit));
+
+            // Moving between buttons ticks; pressing one answers with the click.
+            UiSound.Attach(replayButton, homeButton, quitButton);
         }
 
         void Start()
@@ -37,7 +45,9 @@ namespace SpaceExplorer
             scoreText.text = $"SCORE  {score}";
             bestScoreText.text = $"BEST  {GameSession.BestScore}";
             newRecordBadge.SetActive(GameSession.IsNewRecord);
-            if (GameSession.IsNewRecord) AudioDirector.Play(SoundEffect.NewRecord);
+
+            // The screen's verdict, in sound: rising fanfare or falling game over.
+            AudioDirector.Play(GameSession.IsNewRecord ? SoundEffect.NewRecord : SoundEffect.GameOver);
 
             int medal = MedalIndexFor(score);
             medalImage.gameObject.SetActive(medal >= 0);

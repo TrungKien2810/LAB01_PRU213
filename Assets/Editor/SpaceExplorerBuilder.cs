@@ -25,11 +25,16 @@ public static class SpaceExplorerBuilder
     const int OrderBackground = -100, OrderStar = 4, OrderAsteroid = 5, OrderBoss = 8,
               OrderThruster = 9, OrderShip = 10, OrderLaser = 15, OrderBossBullet = 16, OrderExplosion = 30;
 
+    /// <summary>Handles to the prefabs built in one pass, so the scenes can reference them.</summary>
     sealed class Prefabs
     {
         public GameObject Explosion, Laser, BossBullet, Asteroid, Star, Boss, Player;
     }
 
+    /// <summary>
+    /// Rebuilds every prefab, regenerates the three scenes and rewrites Build Settings.
+    /// Entry point of the <b>Space Explorer &gt; Build Game</b> menu item.
+    /// </summary>
     [MenuItem("Space Explorer/Build Game")]
     public static void BuildGame()
     {
@@ -267,13 +272,15 @@ public static class SpaceExplorerBuilder
 
         Image medal = CreateImage(canvas, "Medal", LoadSprite("UI/medals/ui-medals_0.png"), Center, new Vector2(-420, 0), new Vector2(300, 300)); // art fills ~half of its 128px cell
 
-        Button home = MenuButton(canvas, "Home Button", "MAIN MENU", "UI/ui-icon-home.png", new Vector2(-290, -330));
-        Button quit = MenuButton(canvas, "Quit Button", "QUIT", "UI/ui-icon-quit.png", new Vector2(290, -330));
+        // Replay sits alone on the upper row: it is what a player who just died wants next.
+        Button replay = MenuButton(canvas, "Replay Button", "REPLAY", "UI/ui-icon-play.png", new Vector2(0, -270));
+        Button home = MenuButton(canvas, "Home Button", "MAIN MENU", "UI/ui-icon-home.png", new Vector2(-290, -395));
+        Button quit = MenuButton(canvas, "Quit Button", "QUIT", "UI/ui-icon-quit.png", new Vector2(290, -395));
 
         Set(new GameObject("End Game UI").AddComponent<EndGameUI>(),
             ("scoreText", score), ("bestScoreText", best), ("newRecordBadge", badge.gameObject),
             ("medalImage", medal), ("medalSprites", Frames("UI/medals/ui-medals_", 3)),
-            ("homeButton", home), ("quitButton", quit));
+            ("replayButton", replay), ("homeButton", home), ("quitButton", quit));
         return SaveScene(SceneNames.EndGame);
     }
 

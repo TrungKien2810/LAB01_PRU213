@@ -9,6 +9,7 @@ namespace SpaceExplorer
     /// </summary>
     public sealed class AudioDirector : MonoBehaviour
     {
+        /// <summary>Headroom kept for overlapping effects: clips peak at 1.0, the mix does not.</summary>
         const float MasterGain = 0.7f;
 
         static AudioDirector instance;
@@ -60,6 +61,7 @@ namespace SpaceExplorer
             director.source.playOnAwake = false;
             director.source.loop = false;
             director.source.spatialBlend = 0f; // 2D: the camera moves, the mixer does not
+            director.source.priority = 32;     // default 128 lets the engine steal effects first
             director.clips = SoundBank.CreateAll();
 
             director.lastPlayedAt = new float[director.clips.Length];
@@ -81,15 +83,25 @@ namespace SpaceExplorer
 
         /// <summary>
         /// How long a sound ignores repeat requests. Without it a held fire button would stack
-        /// twenty lasers into a wall of noise instead of a rhythm.
+        /// twenty lasers into a wall of noise instead of a rhythm, a boss sitting on the ship
+        /// would retrigger its ram fifty times a second, and the End Game screen could start its
+        /// jingle twice.
         /// </summary>
         static float MinInterval(SoundEffect effect) => effect switch
         {
             SoundEffect.LaserShot => 0.05f,
             SoundEffect.AsteroidCrack => 0.05f,
+            SoundEffect.Explosion => 0.07f,
             SoundEffect.BossHit => 0.06f,
-            SoundEffect.Explosion => 0.05f,
+            SoundEffect.ShieldImpact => 0.04f,
+            SoundEffect.HullImpact => 0.12f,
+            SoundEffect.UiHover => 0.05f,
             SoundEffect.UiClick => 0.05f,
+            SoundEffect.PlayerHit => 0.10f,
+            SoundEffect.PlayerDeath => 1f,
+            SoundEffect.BossWarning => 1f,
+            SoundEffect.GameOver => 1.5f,
+            SoundEffect.NewRecord => 1.5f,
             _ => 0f,
         };
     }
